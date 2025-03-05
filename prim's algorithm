@@ -1,1 +1,50 @@
+import heapq
+
+class PrimGraph:
+    def __init__(self, vertices):
+        self.vertices = vertices
+        self.adj_matrix = [[0] * vertices for _ in range(vertices)]
+
+    def display_mst(self, mst):
+        print("Edge \tWeight")
+        total_cost = sum(weight for _, _, weight in mst)
+        for start, end, weight in mst:
+            print(f"{chr(65 + start)} - {chr(65 + end)} \t {weight}")
+        print("Total Cost:", total_cost)
+
+    def find_mst(self):
+        mst = []
+        included = [False] * self.vertices
+        priority_queue = [(0, 0, -1)]  # (weight, current node, parent node)
+
+        while priority_queue and len(mst) < self.vertices - 1:
+            weight, current, parent = heapq.heappop(priority_queue)
+
+            if included[current]:
+                continue
+
+            included[current] = True
+            if parent != -1:
+                mst.append((parent, current, weight))
+
+            for neighbor, edge_weight in enumerate(self.adj_matrix[current]):
+                if edge_weight > 0 and not included[neighbor]:
+                    heapq.heappush(priority_queue, (edge_weight, neighbor, current))
+
+        if len(mst) == self.vertices - 1:
+            self.display_mst(mst)
+        else:
+            print("Graph is not connected; MST cannot be formed.")
+
+if __name__ == '__main__':
+    graph = PrimGraph(6)  # Graph with 6 vertices (A-F)
+    graph.adj_matrix = [
+        [0, 3, 0, 0, 6, 5],  # A
+        [3, 0, 1, 0, 0, 4],  # B
+        [0, 1, 0, 6, 0, 4],  # C
+        [0, 0, 6, 0, 8, 5],  # D
+        [6, 0, 0, 8, 0, 2],  # E
+        [5, 4, 4, 5, 2, 0]   # F
+    ]
+    graph.find_mst()
 
